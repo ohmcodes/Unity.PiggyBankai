@@ -97,3 +97,7 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+/PiggyBankai/Assets/2D Pixel Art Platformer Biome - American Forest
+/PiggyBankai/Assets/Pixel Adventure 1
+/PiggyBankai/Library
+/PiggyBankai/Temp
