@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"path": "PiggyBankai"
+		}
+	],
+	"settings": {
+		"dotnet.defaultSolution": "PiggyBankai.sln"
+	}
+}

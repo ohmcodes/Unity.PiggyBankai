@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
@@ -5,62 +6,76 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+	#region Variables
+	[Header("References")]
     [SerializeField] private float speed = 5f;
 	[SerializeField] private SpriteRenderer spriteRenderer;
 	[SerializeField] private Animator animator;
 	[SerializeField] private float unitsPerCoin = 5f;
 	[SerializeField] private PlayerMovementState playerMovementState;
+	[SerializeField] private ParticleSystem coinParticles;
+	[SerializeField] private Rigidbody2D rb;
+	[SerializeField] private GameManager gameManager;
+
 	public float wallJumpCooldown {get; set;}
+	public Transform bulletSpawnPoint;
+	public GameObject bulletPrefab;
+	public float bulletSpeed = 10f;
+	public DistanceManager distanceManager;
+
     private Vector2 movement;
 	private Vector2 initialPosition;
 	private float maxX;
 	private float coinProgress = 0f;
-	private Vector2 screeBounds;
+	private Vector2 screenBounds;
 	private float playerHalfWidth;
 	private float xPosLastFrame;
 	private float distanceWalked = 0f;
-	public CoinManager coinManager;
-
-	public Transform bulletSpawnPoint;
-	public GameObject bulletPrefab;
-	public float bulletSpeed = 10f;
-
-	public DistanceManager distanceManager;
+	private Vector2 particlesStartPos;
+	#endregion
 
     private void Start()
     {
-        screeBounds = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
+        screenBounds = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
 		playerHalfWidth = spriteRenderer.bounds.extents.x;
 		xPosLastFrame = transform.position.x;
 		initialPosition = transform.position;
 		maxX = transform.position.x;
+		particlesStartPos = coinParticles.transform.localPosition;
     }
     // Update is called once per frame
     void Update()
     {
         HandleMovement();
         //ClampMovement();
+		StartStopParticles();
+		FlipCharacterX();
+		
+
 		float deltaX = transform.position.x - xPosLastFrame;
-		if (deltaX > 0)
-		{
-			coinProgress += deltaX;
-		}
+		coinProgress += Mathf.Abs(deltaX);
 		if (transform.position.x > maxX)
 		{
 			maxX = transform.position.x;
 		}
 		distanceWalked = maxX - initialPosition.x;
 		distanceManager.distanceWalked = distanceWalked;
-		FlipCharacterX();
+		
 
 		if (playerMovementState.currentState != PlayerMovementState.MovementState.Jump &&
 		    playerMovementState.currentState != PlayerMovementState.MovementState.DoubleJump &&
 		    playerMovementState.currentState != PlayerMovementState.MovementState.WallJump)
 		{
-			while (coinProgress >= unitsPerCoin)
+			bool hitRight = Physics2D.Raycast(transform.position, Vector2.right, playerHalfWidth + 0.1f, LayerMask.GetMask("Ground"));
+			bool hitLeft = Physics2D.Raycast(transform.position, Vector2.left, playerHalfWidth + 0.1f, LayerMask.GetMask("Ground"));
+			if (!hitRight && !hitLeft)
 			{
-				coinManager.coinCount = Mathf.Max(0, coinManager.coinCount - 1);
-				coinProgress -= unitsPerCoin;
+				while (coinProgress >= unitsPerCoin)
+				{
+					gameManager.coinCount--;
+					gameManager.consumedCoins++;
+					coinProgress -= unitsPerCoin;
+				}
 			}
 		}
 
@@ -71,39 +86,66 @@ public class PlayerMovement : MonoBehaviour
 
 		if(Input.GetButtonDown("Fire1"))
 		{
+			if(gameManager.isDead) {return;}
+
 			GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
 			Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
 			Vector2 direction = spriteRenderer.flipX ? Vector2.left : Vector2.right;
 			rb.velocity = direction * bulletSpeed;
-			coinManager.coinCount--;
+			gameManager.coinCount--;
+			gameManager.consumedCoins++;
 		}
+
+		xPosLastFrame = transform.position.x;
     
     }
 
+	private void StartStopParticles()
+	{
+		if(playerMovementState.currentState == PlayerMovementState.MovementState.Run)
+		{
+			if(!coinParticles.isPlaying)
+			{
+				coinParticles.Play();
+			}
+		}
+		else
+		{
+			if(coinParticles.isPlaying)
+			{
+				coinParticles.Stop();
+			}
+		}
+	}
+
 	private void FlipCharacterX()
 	{
+		if(gameManager.isDead) {return;}
+
 		float input = Input.GetAxisRaw("Horizontal");
 		if(input > 0 && (transform.position.x > xPosLastFrame))
 		{
 			spriteRenderer.flipX = false;
+			coinParticles.transform.localPosition = particlesStartPos;
+			coinParticles.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 		}
 		else if(input < 0 && (transform.position.x < xPosLastFrame))
 		{
 			spriteRenderer.flipX = true;
+			Vector2 particlesPos = particlesStartPos;
+			particlesPos.x = -particlesPos.x;
+			coinParticles.transform.localPosition = particlesPos;
+			coinParticles.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
 		}
-		xPosLastFrame = transform.position.x;
-	}
+		
 
-    private void ClampMovement()
-    {
-        float clampedX = Mathf.Clamp(transform.position.x, -screeBounds.x + playerHalfWidth, screeBounds.x - playerHalfWidth);
-        Vector2 pos = transform.position;
-        pos.x = clampedX;
-        transform.position = pos;
-    }
+		
+	}
 
     private void HandleMovement()
     {
+		if(gameManager.isDead) {return;}
+
 		if(wallJumpCooldown > 0f) {return;}
 
         float input = Input.GetAxisRaw("Horizontal");
@@ -132,12 +174,39 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void KnockbackPlayer(Vector2 knockbackForce, int direction)
     {
-        if(collision.CompareTag("Coin"))
-		{
-			Destroy(collision.gameObject);
-			coinManager.coinCount++;
-		}
+		knockbackForce.x *= direction;
+		rb.velocity = Vector2.zero;
+		rb.angularVelocity = 0f;
+        rb.AddForce(knockbackForce, ForceMode2D.Impulse);
+
+		gameManager.coinCount = Mathf.Max(0, gameManager.coinCount - gameManager.enemyCollideCoinCost);
+		DeathParticles();
+		StartCoroutine(FlashRed(spriteRenderer));
+	}
+
+	public void DeathParticles()
+	{
+        Transform deathParticlesTransform = transform.Find("DeathParticles");
+        if (deathParticlesTransform != null)
+        {
+            ParticleSystem ps = deathParticlesTransform.GetComponent<ParticleSystem>();
+            if (ps != null)
+            {
+                ps.Play();
+            }
+        }
+	}
+
+	private IEnumerator FlashRed(SpriteRenderer sr)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            sr.color = Color.red;
+            yield return new WaitForSeconds(0.1f);
+            sr.color = Color.white;
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 }

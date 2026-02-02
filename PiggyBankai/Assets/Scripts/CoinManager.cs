@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class CoinManager : MonoBehaviour
 {
-    public int coinCount = 100;
-    public Text cointText;
+    [SerializeField] private Text cointText;
+    [SerializeField] private GameManager gameManager;
     
 
     // Start is called before the first frame update
@@ -17,7 +17,6 @@ public class CoinManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        cointText.text = coinCount.ToString();
-       
+        cointText.text = gameManager.coinCount.ToString();
     }
 }

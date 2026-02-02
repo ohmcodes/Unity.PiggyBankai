@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 3182262492525475459}
   - component: {fileID: 4086467550533513579}
   - component: {fileID: 7045572056923793806}
+  - component: {fileID: 8896672480189029270}
   m_Layer: 0
   m_Name: Bullet
-  m_TagString: Untagged
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -73,8 +74,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1728811585
-  m_SortingLayer: 7
+  m_SortingLayerID: 1683973315
+  m_SortingLayer: 8
   m_SortingOrder: 0
   m_Sprite: {fileID: 88892474, guid: 5997eb3fdf612f046a2557a352ea4084, type: 3}
   m_Color: {r: 1, g: 0.65285194, b: 0, a: 1}
@@ -162,3 +163,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifetime: 3
+  coinPrefab: {fileID: 4311155758741753395, guid: 732ed55a505cbe240bd3de33a33f74f5, type: 3}
+--- !u!95 &8896672480189029270
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3986314973617001811}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6e897374e636b4b4ab47b9e47cee8bfa, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

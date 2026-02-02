@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Ground
   - Coin
+  - DeathZone
+  - Enemy
+  - Projectile
   layers:
   - Default
   - TransparentFX
@@ -14,7 +17,7 @@ TagManager:
   - Water
   - UI
   - Ground
-  - 
+  - Enemy
   - 
   - 
   - 
@@ -63,4 +66,7 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 1728811585
+    locked: 0
+  - name: Projectile
+    uniqueID: 1683973315
     locked: 0

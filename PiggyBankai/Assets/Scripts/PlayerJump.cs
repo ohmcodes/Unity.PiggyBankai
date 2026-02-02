@@ -15,8 +15,10 @@ public class PlayerJump : MonoBehaviour
     [SerializeField] private int jumpCoinCost = 1;
     [SerializeField] private int doubleJumpCoinCost = 2;
     [SerializeField] private int wallJumpCoinCost = 3;
-    private PlayerMovement playerMovement;
     [SerializeField] private Animator animator;
+    [SerializeField] private ParticleSystem doubleJumpParticles;
+    [SerializeField] private GameManager gameManager;
+    private PlayerMovement playerMovement;
     private float playerHalfHeight;
     private float playerHalfWidth;
     private bool canDoubleJump;
@@ -34,6 +36,8 @@ public class PlayerJump : MonoBehaviour
     {
         if(Input.GetButtonDown("Jump"))
         {
+            if(gameManager.isDead) {return;}
+
             CheckJumpType();
         }
     }
@@ -95,7 +99,8 @@ public class PlayerJump : MonoBehaviour
     private void Jump(float force)
     {
         rb.AddForce(new Vector2(0, force), ForceMode2D.Impulse);
-        playerMovement.coinManager.coinCount = Mathf.Max(0, playerMovement.coinManager.coinCount - jumpCoinCost);
+        gameManager.coinCount = Mathf.Max(0, gameManager.coinCount - jumpCoinCost);
+        gameManager.consumedCoins += jumpCoinCost;
     }
     private void DoubleJump()
     {
@@ -103,8 +108,10 @@ public class PlayerJump : MonoBehaviour
         rb.angularVelocity = 0f;
         Jump(doubleJumpForce);
         canDoubleJump = false;
+        doubleJumpParticles.Play();
         playerMovementState.SetMoveState(PlayerMovementState.MovementState.DoubleJump);
-        playerMovement.coinManager.coinCount = Mathf.Max(0, playerMovement.coinManager.coinCount - doubleJumpCoinCost);
+        gameManager.coinCount = Mathf.Max(0, gameManager.coinCount - doubleJumpCoinCost);
+        gameManager.consumedCoins += doubleJumpCoinCost;
     }
     private void WallJump(int direction)
     {
@@ -115,6 +122,7 @@ public class PlayerJump : MonoBehaviour
         playerMovement.wallJumpCooldown = wallJumpMovementCooldown;
         rb.AddForce(force, ForceMode2D.Impulse);
         playerMovementState.SetMoveState(PlayerMovementState.MovementState.WallJump);
-        playerMovement.coinManager.coinCount = Mathf.Max(0, playerMovement.coinManager.coinCount - wallJumpCoinCost);
+        gameManager.coinCount = Mathf.Max(0, gameManager.coinCount - wallJumpCoinCost);
+        gameManager.consumedCoins += wallJumpCoinCost;
     }
 }
