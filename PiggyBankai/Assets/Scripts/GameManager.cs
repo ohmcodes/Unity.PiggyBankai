@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CoinManager coinManager;
     [SerializeField] private DistanceManager distanceManager;
     [SerializeField] private int deathCoinReduction = 1;
-    [SerializeField] private float restartDelay = 2f;
+    public float restartDelay = 2f;
     [SerializeField] private float currentBestDistance = 0f;
 
 
@@ -40,6 +40,10 @@ public class GameManager : MonoBehaviour
     private AudioSource bestDistanceAudio;
     private bool playedBestDistanceAudio = false;
 
+    [SerializeField] private GameObject pauseMenu;
+    [SerializeField] private Pause pauseManager;
+
+    private bool isGameOver = false;
 
     // Start is called before the first frame update
     void Start()
@@ -47,6 +51,7 @@ public class GameManager : MonoBehaviour
         lb = FindObjectOfType<LeaderboardManager>();
         bestDistanceAudio = GameObject.Find("BestDistanceAudio").GetComponent<AudioSource>();
         deathAudio = GameObject.Find("LoseGameAudio").GetComponent<AudioSource>();
+
         // Wait for leaderboard manager to initialize player ID
         //StartCoroutine(LoadPersistentData());
 
@@ -110,6 +115,8 @@ public class GameManager : MonoBehaviour
 
     private void GameOver()
     {
+        if(isGameOver) { return; }
+
         if (coinCount == 0)
         {
             // Disable all player movements
@@ -122,9 +129,14 @@ public class GameManager : MonoBehaviour
             {
                 deathAudio.Play();
             }
-            
-            StartCoroutine(RestartGameAfterDelay(restartDelay));
+            if(pauseMenu != null)
+            {
+                pauseManager.ShowPlayerRank();
+                pauseMenu.SetActive(true);
+            }
+
             isDead = false;
+            isGameOver = true;
         }
     }
 
@@ -154,7 +166,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private IEnumerator RestartGameAfterDelay(float delay)
+    public IEnumerator RestartGameAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
         if (distanceWalked > currentBestDistance)

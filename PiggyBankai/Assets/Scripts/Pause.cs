@@ -58,6 +58,18 @@ public class Pause : MonoBehaviour
 
     public void ResumeGame()
     {
-        Time.timeScale = 1f;
+        Debug.Log("Resuming game from pause menu: " + fromPauseMenu);
+
+        if(fromPauseMenu)
+        {
+            Time.timeScale = 1f;
+            fromPauseMenu = false;
+            Debug.Log("Game resumed.");
+        }
+        else
+        {
+            Debug.Log("Restarting game instead of resuming from pause menu.");
+            StartCoroutine(gm.RestartGameAfterDelay(gm.restartDelay));
+        }
     }
 }
