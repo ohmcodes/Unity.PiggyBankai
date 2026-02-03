@@ -12,6 +12,12 @@ public class PlayerCollisions : MonoBehaviour
 
     private float halfHeight;
 
+    private AudioSource stompAudio;
+
+    [Header("Shoot Audio Settings")]
+	[SerializeField] private float stompPitchMin = 0.95f;
+	[SerializeField] private float stompPitchMax = 1.05f;
+
 
     // Start is called before the first frame update
     void Start()
@@ -19,6 +25,7 @@ public class PlayerCollisions : MonoBehaviour
         gameManager = FindObjectOfType<GameManager>();
 
         halfHeight = spriteRenderer.bounds.extents.y;
+        stompAudio = GameObject.Find("StompAudio").GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -66,16 +73,19 @@ public class PlayerCollisions : MonoBehaviour
             //rb.AddForce(Vector2.up * bounceForce, ForceMode2D.Impulse);
 
             float force = bounceForce;
-            if(Input.GetButton("Jump"))
-            {
-                print("High Bounce!");
+            // if(Input.GetButton("Jump"))
+            // {
+            //     print("High Bounce!");
                 
-            }
+            // }
             force *= bounceForceMultiplier;
             rb.AddForce(Vector2.up * force, ForceMode2D.Impulse);
 
             gameManager.SpawnCoins(collision, gameManager.stompCoinReward);
             enemy.Die();
+
+            stompAudio.pitch = Random.Range(stompPitchMin, stompPitchMax);
+			stompAudio.PlayOneShot(stompAudio.clip);
         }
         else
         {

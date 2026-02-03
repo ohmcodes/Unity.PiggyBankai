@@ -10,7 +10,6 @@ public class EnemyMovements : MonoBehaviour
     [SerializeField] private float speed = 3f;
     [SerializeField] private int startDirection = 1;
     private GameManager gameManager;
-    [SerializeField] private int enemyCoinCost = 5;
     [SerializeField] private GameObject coinPrefab;
 
 

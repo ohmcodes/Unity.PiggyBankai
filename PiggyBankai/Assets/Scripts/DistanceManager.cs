@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class DistanceManager : MonoBehaviour
 {
-    public float distanceWalked;
+    //public float distanceWalked;
     [SerializeField] private Text distanceText;
     [SerializeField] private Text bestDistanceText;
     [SerializeField] private GameManager gameManager;
@@ -23,7 +23,7 @@ public class DistanceManager : MonoBehaviour
     {
         if (!gameManager.isDead) 
         { 
-            distanceText.text = "Distance: " + distanceWalked.ToString("F2");
+            distanceText.text = "Distance: " + gameManager.distanceWalked.ToString("F2");
         }
         
     }

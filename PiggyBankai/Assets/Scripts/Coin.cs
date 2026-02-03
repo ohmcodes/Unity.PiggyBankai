@@ -14,12 +14,21 @@ public class Coin : MonoBehaviour
     public float magnetSpeed = 5f;
     [SerializeField] private string[] excludeLayerNames = { "Ground", "Enemy"};
 
+    private AudioSource coinAudio;
+    private AudioSource eatAudio;
+
+    void Awake()
+    {
+        gameManager = FindObjectOfType<GameManager>();
+    }
     // Start is called before the first frame update
     void Start()
     {
-        gameManager = FindObjectOfType<GameManager>();
+        
         rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
+        coinAudio = GameObject.Find("CoinAudio").GetComponent<AudioSource>();
+        eatAudio = GameObject.Find("EatAudio").GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -50,6 +59,11 @@ public class Coin : MonoBehaviour
 
         if(collision.gameObject.CompareTag("Player"))
         {
+            if(eatAudio != null && eatAudio.clip != null)
+            {
+                eatAudio.Play();
+                coinAudio.Play();
+            }
             Destroy(gameObject);
             gameManager.coinCount += CoinValue;
             gameManager.collectedCoins += CoinValue;
@@ -59,6 +73,12 @@ public class Coin : MonoBehaviour
     {
         if(collision.CompareTag("Player"))
 		{
+            if(eatAudio != null && eatAudio.clip != null)
+            {
+                eatAudio.Play();
+                coinAudio.Play();
+            }
+            
 			Destroy(gameObject);
             gameManager.coinCount += CoinValue;
             gameManager.collectedCoins += CoinValue;

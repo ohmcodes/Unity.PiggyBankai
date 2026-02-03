@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,11 +22,20 @@ public class PlayerJump : MonoBehaviour
     private float playerHalfWidth;
     private bool canDoubleJump;
 
+    private AudioSource jumpAudio;
+
+    [Header("Jump Audio Settings")]
+    [SerializeField] private float jumpVolumeMin = 0.7f;
+    [SerializeField] private float jumpVolumeMax = 1.0f;
+    [SerializeField] private float jumpPitchMin = 0.9f;
+    [SerializeField] private float jumpPitchMax = 1.1f;
+
     private void Start()
     {
         playerHalfHeight = spriteRenderer.bounds.extents.y;
         playerHalfWidth = spriteRenderer.bounds.extents.x;
         playerMovement = GetComponent<PlayerMovement>();
+        jumpAudio = GameObject.Find("JumpAudio").GetComponent<AudioSource>();
     }
 
 
@@ -101,7 +109,20 @@ public class PlayerJump : MonoBehaviour
         rb.AddForce(new Vector2(0, force), ForceMode2D.Impulse);
         gameManager.coinCount = Mathf.Max(0, gameManager.coinCount - jumpCoinCost);
         gameManager.consumedCoins += jumpCoinCost;
+        PlayJumpAudio();
     }
+    private void PlayJumpAudio()
+    {
+        if (jumpAudio != null && jumpAudio.clip != null)
+        {
+            // Randomize volume and pitch for variety
+            jumpAudio.volume = UnityEngine.Random.Range(jumpVolumeMin, jumpVolumeMax);
+            jumpAudio.pitch = UnityEngine.Random.Range(jumpPitchMin, jumpPitchMax);
+
+            // Play the jump sound
+            jumpAudio.PlayOneShot(jumpAudio.clip);
+        }
+    }    
     private void DoubleJump()
     {
         rb.velocity = Vector2.zero;
@@ -124,5 +145,7 @@ public class PlayerJump : MonoBehaviour
         playerMovementState.SetMoveState(PlayerMovementState.MovementState.WallJump);
         gameManager.coinCount = Mathf.Max(0, gameManager.coinCount - wallJumpCoinCost);
         gameManager.consumedCoins += wallJumpCoinCost;
+
+         PlayJumpAudio();
     }
 }

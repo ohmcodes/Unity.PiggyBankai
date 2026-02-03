@@ -132,7 +132,7 @@ Rigidbody2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -153,7 +153,6 @@ MonoBehaviour:
   spriteRenderer: {fileID: 5477539336176324091}
   speed: 3
   startDirection: 1
-  enemyCoinCost: 5
   coinPrefab: {fileID: 4311155758741753395, guid: 732ed55a505cbe240bd3de33a33f74f5, type: 3}
 --- !u!70 &151791864846028550
 CapsuleCollider2D:
@@ -205,3 +204,7 @@ MonoBehaviour:
   knockBackToSelf: {x: 2, y: 2}
   knockBackToPlayer: {x: 2, y: 2}
   knockBackDelayToSelf: 1.5
+  damagePitchMin: 0.95
+  damagePitchMax: 1.05
+  damageCoinPitchMin: 0.95
+  damageCoinPitchMax: 1.05

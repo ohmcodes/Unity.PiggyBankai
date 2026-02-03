@@ -12,6 +12,9 @@ public class FloorManager : MonoBehaviour
     public GameObject currentFloor; 
     public List<GameObject> spawnedFloors = new List<GameObject>();
 
+    [Header("Audio")]
+    private AudioSource checkpointAudio;
+
     private Vector3 lastEndPosition = Vector3.zero;
     private GameObject lastSpawnedPrefab; 
     private Transform previousPlayerCheckpoint;
@@ -28,6 +31,7 @@ public class FloorManager : MonoBehaviour
         UpdateCameraConfiner();
         playerCheckpoint = currentFloor.transform.Find("PlayerCheckpoint");
         previousPlayerCheckpoint = playerCheckpoint;
+        checkpointAudio = GameObject.Find("CheckpointAudio").GetComponent<AudioSource>();
     }
 
     void Update()
@@ -56,6 +60,7 @@ public class FloorManager : MonoBehaviour
                 // Update camera confiner to the new current floor's boundaries
                 UpdateCameraConfiner();
                 SetCheckpoints();
+                PlayCheckpointAudio();
                 // Ensure there are always 3 floors ahead
                 int floorsAhead = spawnedFloors.Count - spawnedFloors.IndexOf(currentFloor) - 1;
                 while (floorsAhead < 3)
@@ -106,7 +111,7 @@ public class FloorManager : MonoBehaviour
                     {
                         // Fallback to current floor's checkpoint
                         playerCheckpoint = newCheckpoint;
-                        Debug.LogWarning("PlayerCheckpoint not found in previous floor, using current floor's");
+                        //Debug.LogWarning("PlayerCheckpoint not found in previous floor, using current floor's");
                     }
                 }
                 //Debug.Log("Player checkpoint updated to current floor's PlayerCheckpoint");
@@ -115,6 +120,15 @@ public class FloorManager : MonoBehaviour
             {
                 //Debug.LogWarning("PlayerCheckpoint not found in current floor");
             }
+        }
+    }
+
+    private void PlayCheckpointAudio()
+    {
+        if (checkpointAudio != null && checkpointAudio.clip != null)
+        {
+            checkpointAudio.PlayOneShot(checkpointAudio.clip);
+            //Debug.Log("Checkpoint audio played.");
         }
     }
 

@@ -136,6 +136,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CoinValue: 1
   magnetSpeed: 50
+  excludeLayerNames:
+  - Ground
+  - Enemy
 --- !u!95 &9001243357320439937
 Animator:
   serializedVersion: 5

@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class AudioManager : MonoBehaviour
 {
+    [SerializeField] private Button AudioOnButton;
+    [SerializeField] private Button AudioOffButton;
+
     public static AudioManager Instance;
     public AudioMixer audioMixer;
     public Slider musicSlider, fxSlider, masterSlider;
@@ -15,7 +18,7 @@ public class AudioManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -26,6 +29,19 @@ public class AudioManager : MonoBehaviour
     void Start()
     {
         LoadAudioSettings();
+
+        int muted = PlayerPrefs.GetInt("Muted", 1); // Default to 1 (audio on)
+        AudioListener.volume = muted;
+        if (muted == 0)
+        {
+            AudioOnButton.gameObject.SetActive(false);
+            AudioOffButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            AudioOnButton.gameObject.SetActive(true);
+            AudioOffButton.gameObject.SetActive(false);
+        }
     }
 
     public void SetMusicVolume(float volume)
@@ -81,5 +97,21 @@ public class AudioManager : MonoBehaviour
     private float ConvertToDecibels(float volume)
     {
         return Mathf.Log10(volume) * 20f;
+    }
+
+    public void AudioOn()
+    {
+        AudioListener.volume = 1f;
+
+        PlayerPrefs.SetInt("Muted", 1);
+        PlayerPrefs.Save();
+    }
+
+    public void AudioOff()
+    {
+        AudioListener.volume = 0f;
+
+        PlayerPrefs.SetInt("Muted", 0);
+        PlayerPrefs.Save();
     }
 }

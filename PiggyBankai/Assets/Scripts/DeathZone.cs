@@ -10,6 +10,8 @@ public class DeathZone : MonoBehaviour
     private Collider2D playerCollider;
     private GameManager gm;
 
+    private AudioSource deathAudio;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -35,6 +37,7 @@ public class DeathZone : MonoBehaviour
         }
 
         gm = FindObjectOfType<GameManager>();
+        deathAudio = GameObject.Find("LoseGameAudio").GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -98,8 +101,14 @@ public class DeathZone : MonoBehaviour
         isDead = true;
         gm.isDead = true;
         PlayDeathParticles(playerCollider);
+        if (deathAudio != null && deathAudio.clip != null)
+        {
+            deathAudio.Play();
+        }
+        
         // Add delay before respawning
         StartCoroutine(RespawnAfterDelay(gm));
+        
     }
 
     private void PlayDeathParticles(Collider2D playerCollider)

@@ -35,12 +35,15 @@ public class GameManager : MonoBehaviour
     public int shootCoinReward = 5;
     public int enemyCollideCoinCost = 5;
 
+    private AudioSource bestDistanceAudio;
+    private bool playedBestDistanceAudio = false;
 
 
     // Start is called before the first frame update
     void Start()
     {
         lb = FindObjectOfType<LeaderboardManager>();
+        bestDistanceAudio = GameObject.Find("BestDistanceAudio").GetComponent<AudioSource>();
         
         // Wait for leaderboard manager to initialize player ID
         //StartCoroutine(LoadPersistentData());
@@ -59,7 +62,7 @@ public class GameManager : MonoBehaviour
             // Optionally save back to PlayerPrefs
             PlayerPrefs.SetFloat(playerKey + "_CurrentBestDistance", currentBestDistance);
             PlayerPrefs.Save();
-            Debug.Log("Loaded persistent data - Best Distance: " + currentBestDistance + ", Coin Count: " + coinCount);
+            //Debug.Log("Loaded persistent data - Best Distance: " + currentBestDistance + ", Coin Count: " + coinCount);
         });
     }
 
@@ -87,6 +90,20 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         GameOver();
+
+        BestDistanceReachedCheck();
+    }
+
+    private void BestDistanceReachedCheck()
+    {
+        if (distanceWalked > bestDistance)
+        {
+            if (!playedBestDistanceAudio)
+            {
+                bestDistanceAudio.Play();
+                playedBestDistanceAudio = true;
+            }
+        }
     }
 
     private void GameOver()
@@ -126,16 +143,16 @@ public class GameManager : MonoBehaviour
                 rb.isKinematic = true; // Or disable gravity, etc.
             }
 
-            Debug.Log("Player movements disabled due to zero coins");
+            //Debug.Log("Player movements disabled due to zero coins");
         }
     }
 
     private IEnumerator RestartGameAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        if (distanceManager.distanceWalked > currentBestDistance)
+        if (distanceWalked > currentBestDistance)
         {
-            currentBestDistance = distanceManager.distanceWalked;
+            currentBestDistance = distanceWalked;
             distanceManager.UpdateBestDistance(currentBestDistance);
             lb.SubmitScore(currentBestDistance);
         }
@@ -204,9 +221,9 @@ public class GameManager : MonoBehaviour
             // Reduce coins as penalty
             coinCount = Mathf.Max(0, coinCount - deathCoinReduction);
             // Update best distance if applicable
-            if (distanceManager.distanceWalked > currentBestDistance)
+            if (distanceWalked > currentBestDistance)
             {
-                currentBestDistance = distanceManager.distanceWalked;
+                currentBestDistance = distanceWalked;
                 distanceManager.UpdateBestDistance(currentBestDistance);
                 lb.SubmitScore(currentBestDistance);
             }

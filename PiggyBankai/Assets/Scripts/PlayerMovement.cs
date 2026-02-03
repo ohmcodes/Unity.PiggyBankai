@@ -1,7 +1,7 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -28,20 +28,57 @@ public class PlayerMovement : MonoBehaviour
 	private float maxX;
 	private float coinProgress = 0f;
 	private Vector2 screenBounds;
+	private float playerHalfHeight;
 	private float playerHalfWidth;
 	private float xPosLastFrame;
 	private float distanceWalked = 0f;
 	private Vector2 particlesStartPos;
 	#endregion
 
+	private AudioSource footstepsAudio;
+	[SerializeField] private AudioSource shootAudio;
+
+	[Header("Footsteps Settings")]
+	[SerializeField] private float footstepsVolumeMin = 0.3f;
+	[SerializeField] private float footstepsVolumeMax = 0.6f;
+	[SerializeField] private float footstepsPitchMin = 0.9f;
+	[SerializeField] private float footstepsPitchMax = 1.1f;
+	[SerializeField] private float footstepsInterval = 0.3f; // Time between footstep sounds
+
+	[Header("Shoot Audio Settings")]
+	[SerializeField] private float shootPitchMin = 0.95f;
+	[SerializeField] private float shootPitchMax = 1.05f;
+
+	private float lastFootstepTime = 0f;
+	private bool wasMovingLastFrame = false;
+
+	private void PlayFootstepSound()
+	{
+		if (footstepsAudio != null && footstepsAudio.clip != null)
+		{
+			// Randomize volume and pitch for variety
+			footstepsAudio.volume = UnityEngine.Random.Range(footstepsVolumeMin, footstepsVolumeMax);
+			footstepsAudio.pitch = UnityEngine.Random.Range(footstepsPitchMin, footstepsPitchMax);
+
+			// Play the footstep sound
+			footstepsAudio.PlayOneShot(footstepsAudio.clip);
+		}
+	}
+	private bool IsGrounded()
+	{
+		return Physics2D.Raycast(transform.position, Vector2.down, playerHalfHeight + 0.1f, LayerMask.GetMask("Ground"));
+	}
     private void Start()
     {
         screenBounds = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
 		playerHalfWidth = spriteRenderer.bounds.extents.x;
+		playerHalfHeight = spriteRenderer.bounds.extents.y;
 		xPosLastFrame = transform.position.x;
 		initialPosition = transform.position;
 		maxX = transform.position.x;
 		particlesStartPos = coinParticles.transform.localPosition;
+		footstepsAudio = GameObject.Find("FootstepsAudio").GetComponent<AudioSource>();
+
     }
     // Update is called once per frame
     void Update()
@@ -59,7 +96,8 @@ public class PlayerMovement : MonoBehaviour
 			maxX = transform.position.x;
 		}
 		distanceWalked = maxX - initialPosition.x;
-		distanceManager.distanceWalked = distanceWalked;
+		//distanceManager.distanceWalked = distanceWalked;
+		gameManager.distanceWalked = distanceWalked;
 		
 
 		if (playerMovementState.currentState != PlayerMovementState.MovementState.Jump &&
@@ -94,6 +132,13 @@ public class PlayerMovement : MonoBehaviour
 			rb.velocity = direction * bulletSpeed;
 			gameManager.coinCount--;
 			gameManager.consumedCoins++;
+			
+			// Play shoot audio with random pitch
+			if (shootAudio != null && shootAudio.clip != null)
+			{
+				shootAudio.pitch = UnityEngine.Random.Range(shootPitchMin, shootPitchMax);
+				shootAudio.PlayOneShot(shootAudio.clip);
+			}
 		}
 
 		xPosLastFrame = transform.position.x;
@@ -152,7 +197,9 @@ public class PlayerMovement : MonoBehaviour
         movement.x = input * speed * Time.deltaTime;
         movement.y = 0f;
 
-        if (movement.x != 0)
+        bool isMoving = movement.x != 0;
+
+        if (isMoving)
         {
             Vector2 direction = movement.x > 0 ? Vector2.right : Vector2.left;
             BoxCollider2D collider = GetComponent<BoxCollider2D>();
@@ -171,7 +218,27 @@ public class PlayerMovement : MonoBehaviour
             {
                 transform.Translate(movement);
             }
-        }
+
+			// Improved footsteps system - only play when grounded
+			bool isGrounded = IsGrounded();
+			if (isGrounded)
+			{
+				if (!wasMovingLastFrame)
+				{
+					// Just started moving - play first footstep immediately
+					PlayFootstepSound();
+					lastFootstepTime = Time.time;
+				}
+				else if (Time.time - lastFootstepTime >= footstepsInterval)
+				{
+					// Time for next footstep
+					PlayFootstepSound();
+					lastFootstepTime = Time.time;
+				}
+			}
+		}
+
+		wasMovingLastFrame = isMoving;
     }
 
     public void KnockbackPlayer(Vector2 knockbackForce, int direction)

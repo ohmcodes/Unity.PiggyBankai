@@ -13,6 +13,7 @@ public class LeaderboardManager : MonoBehaviour
     public class ScoreEntry
     {
         public string id;
+        public string playername;
         public float score;
     }
 
@@ -20,6 +21,18 @@ public class LeaderboardManager : MonoBehaviour
     public class LeaderboardData
     {
         public List<ScoreEntry> scores;
+    }
+
+    [Serializable]
+    public class ScoreArrayWrapper
+    {
+        public ScoreEntry[] items;
+    }
+
+    [Serializable]
+    public class PlayerRankData
+    {
+        public int rank;
     }
 
     void Start()
@@ -66,7 +79,7 @@ public class LeaderboardManager : MonoBehaviour
     {
         ScoreEntry entry = new ScoreEntry { id = playerId, score = score };
         string json = JsonUtility.ToJson(entry);
-        Debug.Log("Submitting score - ID: " + playerId + ", Score: " + score + ", JSON: " + json);
+        //Debug.Log("Submitting score - ID: " + playerId + ", Score: " + score + ", JSON: " + json);
 
         UnityWebRequest request = new UnityWebRequest(endpoint + "/score", "POST");
         request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(json));
@@ -77,12 +90,12 @@ public class LeaderboardManager : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Score submitted successfully");
+            //Debug.Log("Score submitted successfully");
         }
         else
         {
-            Debug.LogError("Error submitting score: " + request.error);
-            Debug.LogError("Response: " + request.downloadHandler.text);
+            //Debug.LogError("Error submitting score: " + request.error);
+            //Debug.LogError("Response: " + request.downloadHandler.text);
         }
     }
 
@@ -104,6 +117,11 @@ public class LeaderboardManager : MonoBehaviour
     public void GetPlayerScore(System.Action<float> callback)
     {
         StartCoroutine(GetPlayerScoreCoroutine(callback));
+    }
+
+    public void GetPlayerRankDirect(System.Action<int> callback)
+    {
+        StartCoroutine(GetPlayerRankDirectCoroutine(callback));
     }
 
     public void GetRankForId(string id, System.Action<int> callback)
@@ -135,31 +153,106 @@ public class LeaderboardManager : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             string json = request.downloadHandler.text;
-            // Assume it returns {"score": 15.73} or similar
-            ScoreEntry entry = JsonUtility.FromJson<ScoreEntry>(json);
-            callback?.Invoke(entry.score);
+            //Debug.Log("Received player score JSON: " + json);
+            
+            // Try parsing as object first
+            try
+            {
+                ScoreEntry entry = JsonUtility.FromJson<ScoreEntry>(json);
+                callback?.Invoke(entry.score);
+            }
+            catch
+            {
+                // If it's just a number, parse directly
+                if (float.TryParse(json, out float score))
+                {
+                    callback?.Invoke(score);
+                }
+                else
+                {
+                    //Debug.LogError("Failed to parse player score: " + json);
+                    callback?.Invoke(0f);
+                }
+            }
         }
         else
         {
-            Debug.LogError("Error getting player score: " + request.error);
+            //Debug.LogError("Error getting player score: " + request.error);
+            //Debug.LogError("Response: " + request.downloadHandler.text);
             callback?.Invoke(0f);
         }
     }
 
-    private IEnumerator GetLeaderboardCoroutine(System.Action<List<ScoreEntry>> callback)
+    private IEnumerator GetPlayerRankDirectCoroutine(System.Action<int> callback)
     {
-        UnityWebRequest request = UnityWebRequest.Get(endpoint + "/top10");
+        UnityWebRequest request = UnityWebRequest.Get(endpoint + "/rank/" + playerId);
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
             string json = request.downloadHandler.text;
-            LeaderboardData data = JsonUtility.FromJson<LeaderboardData>(json);
+            //Debug.Log("Received rank JSON: " + json);
+            
+            try
+            {
+                // Try to parse as object first
+                PlayerRankData rankData = JsonUtility.FromJson<PlayerRankData>(json);
+                callback?.Invoke(rankData.rank);
+            }
+            catch
+            {
+                // If it's just a number, parse directly
+                if (int.TryParse(json, out int rank))
+                {
+                    callback?.Invoke(rank);
+                }
+                else
+                {
+                    //Debug.LogError("Failed to parse player rank: " + json);
+                    callback?.Invoke(-1);
+                }
+            }
+        }
+        else
+        {
+            //Debug.LogError("Error getting player rank: " + request.error);
+            //Debug.LogError("Response: " + request.downloadHandler.text);
+            callback?.Invoke(-1);
+        }
+    }
+
+    private IEnumerator GetLeaderboardCoroutine(System.Action<List<ScoreEntry>> callback)
+    {
+        UnityWebRequest request = UnityWebRequest.Get(endpoint + "/list");
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            string json = request.downloadHandler.text;
+            //Debug.Log("Received leaderboard JSON: " + json);
+            
+            LeaderboardData data = new LeaderboardData();
+            
+            // Check if JSON starts with [ (array) or { (object)
+            if (json.TrimStart().StartsWith("["))
+            {
+                // Server returns direct array - wrap it for parsing
+                string wrappedJson = "{\"items\":" + json + "}";
+                ScoreArrayWrapper wrapper = JsonUtility.FromJson<ScoreArrayWrapper>(wrappedJson);
+                data.scores = new List<ScoreEntry>(wrapper.items);
+            }
+            else
+            {
+                // Server returns object with scores field
+                data = JsonUtility.FromJson<LeaderboardData>(json);
+            }
+            
             callback?.Invoke(data.scores);
         }
         else
         {
-            Debug.LogError("Error getting leaderboard: " + request.error);
+            //Debug.LogError("Error getting leaderboard: " + request.error);
+            //Debug.LogError("Response: " + request.downloadHandler.text);
             callback?.Invoke(new List<ScoreEntry>());
         }
     }
@@ -172,7 +265,23 @@ public class LeaderboardManager : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             string json = request.downloadHandler.text;
-            LeaderboardData data = JsonUtility.FromJson<LeaderboardData>(json);
+            //Debug.Log("Received JSON: " + json);
+            
+            LeaderboardData data = new LeaderboardData();
+            
+            // Check if JSON starts with [ (array) or { (object)
+            if (json.TrimStart().StartsWith("["))
+            {
+                // Server returns direct array - wrap it for parsing
+                string wrappedJson = "{\"items\":" + json + "}";
+                ScoreArrayWrapper wrapper = JsonUtility.FromJson<ScoreArrayWrapper>(wrappedJson);
+                data.scores = new List<ScoreEntry>(wrapper.items);
+            }
+            else
+            {
+                // Server returns object with scores field
+                data = JsonUtility.FromJson<LeaderboardData>(json);
+            }
             
             // Assume server returns top 10 sorted, but limit if needed
             List<ScoreEntry> topScores = data.scores.GetRange(0, Mathf.Min(limit, data.scores.Count));
@@ -181,9 +290,30 @@ public class LeaderboardManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Error getting leaderboard: " + request.error);
+            //Debug.LogError("Error getting leaderboard: " + request.error);
+            //Debug.LogError("Response: " + request.downloadHandler.text);
             callback?.Invoke(new List<ScoreEntry>());
         }
+    }
+
+    public string FormatScore(float score)
+    {
+        if (score >= 1000000000000000000000f) // 10^21
+            return (score / 1000000000000000000000f).ToString("F2") + " " + "Si";
+        else if (score >= 1000000000000000000f) // 10^18
+            return (score / 1000000000000000000f).ToString("F2") + " " + "Qi";
+        else if (score >= 1000000000000000f) // 10^15
+            return (score / 1000000000000000f).ToString("F2") + " " + "Tr";
+        else if (score >= 1000000000000f) // 10^12
+            return (score / 1000000000000f).ToString("F2") + " " + "T";
+        else if (score >= 1000000000f) // 10^9
+            return (score / 1000000000f).ToString("F2") + " " + "B";
+        else if (score >= 1000000f) // 10^6
+            return (score / 1000000f).ToString("F2") + " " + "M";
+        else if (score >= 1000f) // 10^3
+            return (score / 1000f).ToString("F2") + " " + "K";
+        else
+            return score.ToString("F2");
     }
 }
 
@@ -191,26 +321,26 @@ public class LeaderboardManager : MonoBehaviour
 /*
 leaderboardManager.GetPlayerRank(rank => {
     if (rank > 0) {
-        Debug.Log("Your rank: " + rank);
+        //Debug.Log("Your rank: " + rank);
     } else {
-        Debug.Log("You're not on the leaderboard yet!");
+        //Debug.Log("You're not on the leaderboard yet!");
     }
 });
 
 // Get your own rank
 leaderboardManager.GetPlayerRank(rank => {
-    Debug.Log("My rank: " + rank);
+    //Debug.Log("My rank: " + rank);
 });
 
 // Get rank for a specific ID (e.g., from another player)
 leaderboardManager.GetRankForId("some-unique-id", rank => {
-    Debug.Log("Their rank: " + rank);
+    //Debug.Log("Their rank: " + rank);
 });
 
 // Get top 10 (default)
 leaderboardManager.GetTopLeaderboard(scores => {
     foreach (var score in scores) {
-        Debug.Log($"{score.id}: {score.score}");
+        //Debug.Log($"{score.id}: {score.score}");
     }
 });
 
