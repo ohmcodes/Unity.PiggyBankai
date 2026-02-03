@@ -13,10 +13,17 @@ public class Pause : MonoBehaviour
     private GameManager gm;
     private LeaderboardManager lb;
 
+    public bool fromPauseMenu = false;
+
     void Awake()
     {
         lb = FindObjectOfType<LeaderboardManager>();
         gm = FindObjectOfType<GameManager>();
+    }
+
+    public void SetFromPauseMenu(bool value)
+    {
+        fromPauseMenu = value;
     }
 
     public void ShowPlayerRank()

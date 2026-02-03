@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
 
 
     private LeaderboardManager lb;
+
+    private AudioSource deathAudio;
     
 
     public int coinCount = 100;
@@ -44,7 +46,7 @@ public class GameManager : MonoBehaviour
     {
         lb = FindObjectOfType<LeaderboardManager>();
         bestDistanceAudio = GameObject.Find("BestDistanceAudio").GetComponent<AudioSource>();
-        
+        deathAudio = GameObject.Find("LoseGameAudio").GetComponent<AudioSource>();
         // Wait for leaderboard manager to initialize player ID
         //StartCoroutine(LoadPersistentData());
 
@@ -115,6 +117,11 @@ public class GameManager : MonoBehaviour
             
             // Save persistent data before restarting
             //SavePersistentData();
+
+            if (deathAudio != null && deathAudio.clip != null)
+            {
+                deathAudio.Play();
+            }
             
             StartCoroutine(RestartGameAfterDelay(restartDelay));
             isDead = false;

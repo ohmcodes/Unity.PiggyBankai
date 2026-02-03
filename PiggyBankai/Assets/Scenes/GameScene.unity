@@ -5920,6 +5920,7 @@ Transform:
   - {fileID: 443468783}
   - {fileID: 801461180}
   - {fileID: 1610515007}
+  - {fileID: 1296963553}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &242392709
@@ -11383,7 +11384,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: f8d96d255ec40b34ab7182a6cc011c7d, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -12149,7 +12150,7 @@ GameObject:
   - component: {fileID: 801461180}
   - component: {fileID: 801461181}
   m_Layer: 0
-  m_Name: BestReachedAudio
+  m_Name: BestDistanceAudio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12182,7 +12183,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: ff1950cd9a7c38d4191ff39395715392, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -17744,6 +17745,7 @@ MonoBehaviour:
   currentDistance: {fileID: 1626296792}
   coinConsumed: {fileID: 101162620}
   coinCollected: {fileID: 422373311}
+  fromPauseMenu: 0
 --- !u!1 &1136972575
 GameObject:
   m_ObjectHideFlags: 0
@@ -18562,7 +18564,7 @@ GameObject:
   - component: {fileID: 1296963553}
   - component: {fileID: 1296963552}
   m_Layer: 0
-  m_Name: Audio Source
+  m_Name: BGM
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18580,10 +18582,10 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 5cd953d55beeadd43a1a29270ec6f789, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.2
   m_Pitch: 1
   Loop: 1
-  Mute: 1
+  Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
@@ -18672,12 +18674,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1296963551}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 231.32181, y: 158.25859, z: 0.14866051}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 241.1118, y: 160.40858, z: 0.14866051}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 202250231}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1355311406
 GameObject:
@@ -18787,18 +18789,6 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1081269530}
         m_TargetAssemblyTypeName: Pause, Assembly-CSharp
-        m_MethodName: PauseGame
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 1081269530}
-        m_TargetAssemblyTypeName: Pause, Assembly-CSharp
         m_MethodName: ShowPlayerRank
         m_Mode: 1
         m_Arguments:
@@ -18812,6 +18802,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1401243353}
         m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
         m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1081269530}
+        m_TargetAssemblyTypeName: Pause, Assembly-CSharp
+        m_MethodName: PauseGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -25686,4 +25688,3 @@ SceneRoots:
   - {fileID: 595265945}
   - {fileID: 242392709}
   - {fileID: 1215401096}
-  - {fileID: 1296963553}

@@ -51,6 +51,7 @@ public class PlayerMovement : MonoBehaviour
 
 	private float lastFootstepTime = 0f;
 	private bool wasMovingLastFrame = false;
+	private bool wasFirePressedLastFrame = false;
 
 	private void PlayFootstepSound()
 	{
@@ -122,30 +123,37 @@ public class PlayerMovement : MonoBehaviour
 			wallJumpCooldown -= Time.deltaTime;
 		}
 
-		if(Input.GetButtonDown("Fire1"))
-		{
-			if(gameManager.isDead) {return;}
+		if(Input.GetButtonDown("Fire1") || (Input.GetAxis("Fire1") > 0.5f && !wasFirePressedLastFrame))
+        {
+    		HandleFiring();
+        }
 
-			GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
-			Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-			Vector2 direction = spriteRenderer.flipX ? Vector2.left : Vector2.right;
-			rb.velocity = direction * bulletSpeed;
-			gameManager.coinCount--;
-			gameManager.consumedCoins++;
-			
-			// Play shoot audio with random pitch
-			if (shootAudio != null && shootAudio.clip != null)
-			{
-				shootAudio.pitch = UnityEngine.Random.Range(shootPitchMin, shootPitchMax);
-				shootAudio.PlayOneShot(shootAudio.clip);
-			}
-		}
+        wasFirePressedLastFrame = Input.GetAxis("Fire1") > 0.5f;
 
-		xPosLastFrame = transform.position.x;
+        xPosLastFrame = transform.position.x;
     
     }
 
-	private void StartStopParticles()
+    private void HandleFiring()
+    {
+        if (gameManager.isDead) { return; }
+
+        GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
+        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+        Vector2 direction = spriteRenderer.flipX ? Vector2.left : Vector2.right;
+        rb.velocity = direction * bulletSpeed;
+        gameManager.coinCount--;
+        gameManager.consumedCoins++;
+
+        // Play shoot audio with random pitch
+        if (shootAudio != null && shootAudio.clip != null)
+        {
+            shootAudio.pitch = UnityEngine.Random.Range(shootPitchMin, shootPitchMax);
+            shootAudio.PlayOneShot(shootAudio.clip);
+        }
+    }
+
+    private void StartStopParticles()
 	{
 		if(playerMovementState.currentState == PlayerMovementState.MovementState.Run)
 		{

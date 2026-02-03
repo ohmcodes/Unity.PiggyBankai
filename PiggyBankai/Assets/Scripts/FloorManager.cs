@@ -18,6 +18,7 @@ public class FloorManager : MonoBehaviour
     private Vector3 lastEndPosition = Vector3.zero;
     private GameObject lastSpawnedPrefab; 
     private Transform previousPlayerCheckpoint;
+    private List<int> passedFloors;
     
 
     void Start()
@@ -32,6 +33,7 @@ public class FloorManager : MonoBehaviour
         playerCheckpoint = currentFloor.transform.Find("PlayerCheckpoint");
         previousPlayerCheckpoint = playerCheckpoint;
         checkpointAudio = GameObject.Find("CheckpointAudio").GetComponent<AudioSource>();
+        passedFloors = new List<int>();
     }
 
     void Update()
@@ -46,6 +48,15 @@ public class FloorManager : MonoBehaviour
             if (endLoc != null && player.position.x > endLoc.position.x)
             {
                 int currentIndex = spawnedFloors.IndexOf(currentFloor);
+                
+                // Only play audio and add to passed floors if this floor hasn't been passed before
+                if (!passedFloors.Contains(currentIndex))
+                {
+                    passedFloors.Add(currentIndex);
+                    PlayCheckpointAudio();
+                    //Debug.Log("New floor passed: " + currentIndex + ". Total passed floors: " + passedFloors.Count);
+                }
+
                 if (currentIndex == spawnedFloors.Count - 1)
                 {
                     // Reached the end of the last floor, spawn a new one
@@ -60,7 +71,6 @@ public class FloorManager : MonoBehaviour
                 // Update camera confiner to the new current floor's boundaries
                 UpdateCameraConfiner();
                 SetCheckpoints();
-                PlayCheckpointAudio();
                 // Ensure there are always 3 floors ahead
                 int floorsAhead = spawnedFloors.Count - spawnedFloors.IndexOf(currentFloor) - 1;
                 while (floorsAhead < 3)
