@@ -21,6 +21,14 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        bool enableRandom = Random.Range(0, 2) == 0;
+        if (!enableRandom)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+
         damageAudio = GameObject.Find("DamageAudio").GetComponent<AudioSource>();
         damageCoinAudio = GameObject.Find("DamageCoinAudio").GetComponent<AudioSource>();
     }

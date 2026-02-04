@@ -2824,6 +2824,7 @@ GameObject:
   - component: {fileID: 8899468384919964318}
   - component: {fileID: 4763429523678854697}
   - component: {fileID: 7799125044414673649}
+  - component: {fileID: -813292101112856839}
   m_Layer: 0
   m_Name: Map2
   m_TagString: Untagged
@@ -2895,6 +2896,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDead: 0
+--- !u!114 &-813292101112856839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3772126017179030950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b7e614538061fd4ca494cab4faef94d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canBeSpawnedOnStart: 1
 --- !u!1 &6073458995438680172
 GameObject:
   m_ObjectHideFlags: 0

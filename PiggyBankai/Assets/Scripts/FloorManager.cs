@@ -151,7 +151,21 @@ public class FloorManager : MonoBehaviour
             do
             {
                 selectedPrefab = floorPrefabs[Random.Range(0, floorPrefabs.Length)];
-            } while (selectedPrefab == lastSpawnedPrefab && floorPrefabs.Length > 1);
+                
+                // For initial floors, check if it can be spawned on start
+                if (spawnedFloors.Count == 0)
+                {
+                    Floor floorScript = selectedPrefab.GetComponent<Floor>();
+                    if (floorScript != null && floorScript.canBeSpawnedOnStart)
+                    {
+                        Debug.Log("Selected floor cannot be spawned on start, selecting another.");
+                        // This floor can be spawned on start, try another one
+                        continue;
+                    }
+                }
+            } while ((selectedPrefab == lastSpawnedPrefab && floorPrefabs.Length > 1) || 
+                     (spawnedFloors.Count == 0 && selectedPrefab.GetComponent<Floor>() != null && 
+                      !selectedPrefab.GetComponent<Floor>().canBeSpawnedOnStart));
             
             lastSpawnedPrefab = selectedPrefab;
             

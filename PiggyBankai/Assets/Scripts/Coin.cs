@@ -14,6 +14,8 @@ public class Coin : MonoBehaviour
     public float magnetSpeed = 5f;
     [SerializeField] private string[] excludeLayerNames = { "Ground", "Enemy"};
 
+    [SerializeField] private bool isStaticCoin = false;
+
     private AudioSource coinAudio;
     private AudioSource eatAudio;
 
@@ -24,7 +26,16 @@ public class Coin : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        if(isStaticCoin)
+        {
+            bool enableRandom = Random.Range(0, 2) == 0;
+            if (!enableRandom)
+            {
+                Destroy(gameObject);
+                return;
+            }
+        }
+
         rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
         coinAudio = GameObject.Find("CoinAudio").GetComponent<AudioSource>();

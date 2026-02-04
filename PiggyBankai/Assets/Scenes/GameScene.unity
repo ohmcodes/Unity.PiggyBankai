@@ -12116,9 +12116,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floorPrefabs:
+  - {fileID: 7026262530247545699, guid: 484808bc87c89cd44ba54b0823d88d83, type: 3}
+  - {fileID: 7026262530247545699, guid: 091f575b7a4f88c439e2d9d93bad617e, type: 3}
+  - {fileID: 7026262530247545699, guid: 67c729f9a090f934fa86e367d8e73c81, type: 3}
+  - {fileID: 7026262530247545699, guid: 2b161b0e9d868b04ebad97efe5b6c844, type: 3}
+  - {fileID: 7026262530247545699, guid: 16e5cc92a06267240a9016c8576ece75, type: 3}
+  - {fileID: 7026262530247545699, guid: 2f097e08b84570048b69677fba4bcf35, type: 3}
+  - {fileID: 7026262530247545699, guid: ec2ce84125c14a0438f7ea324e6441b2, type: 3}
+  - {fileID: 7026262530247545699, guid: 3289b76b90106ea45b7c76b5df55a136, type: 3}
+  - {fileID: 7026262530247545699, guid: b464ce0a73ebc314ca5b63e5d9110b42, type: 3}
+  - {fileID: 7026262530247545699, guid: 36214bf8cea1629418fb8488e10c6b7d, type: 3}
+  - {fileID: 7026262530247545699, guid: 88b4b57cef1f2e14c9b5fa461885dc91, type: 3}
   - {fileID: 7026262530247545699, guid: 427aa4abe09105e40bf4a0f046d8fb7a, type: 3}
   - {fileID: 7026262530247545699, guid: 216a16c5dfea2c44dbb3973304e2a89e, type: 3}
   - {fileID: 7026262530247545699, guid: 47923d1638c07a4478a97f5c3b7421b5, type: 3}
+  - {fileID: 7026262530247545699, guid: 1ffa7ed6c20e14042803eab3227b9018, type: 3}
+  - {fileID: 7026262530247545699, guid: 110bbeb28e39fe84fb125daa40fa7638, type: 3}
+  - {fileID: 3772126017179030950, guid: a4dbd3061a70d204cae116b2ab689887, type: 3}
+  - {fileID: 3772126017179030950, guid: f415859a1b0282c4193315b5f55db18d, type: 3}
   player: {fileID: 1206274247}
   stateDrivenCamera: {fileID: 1428605147}
   playerCheckpoint: {fileID: 0}
@@ -25011,7 +25026,7 @@ MonoBehaviour:
   deathCoinReduction: 1
   restartDelay: 0
   currentBestDistance: 0
-  coinCount: 10
+  coinCount: 100
   distanceWalked: 0
   bestDistance: 0
   isDead: 0

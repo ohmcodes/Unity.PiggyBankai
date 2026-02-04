@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using System;
+using System.Runtime.InteropServices;
 
 public class LeaderboardManager : MonoBehaviour
 {
     public string endpoint = "https://leaderboard.ohmcodes.com"; // Base endpoint
     private string playerId;
+
+    // JavaScript interop for WebGL
+    [DllImport("__Internal")]
+    private static extern string GetBrowserId();
 
     [Serializable]
     public class ScoreEntry
@@ -75,11 +80,17 @@ public class LeaderboardManager : MonoBehaviour
         StartCoroutine(SubmitScoreCoroutine(score));
     }
 
+    public void UpdatePlayerName(string newName)
+    {
+        StartCoroutine(UpdatePlayerNameCoroutine(newName));
+    }
+
     private IEnumerator SubmitScoreCoroutine(float score)
     {
-        ScoreEntry entry = new ScoreEntry { id = playerId, score = score };
+        string playerName = PlayerPrefs.GetString("PlayerName", "Anonymous");
+        ScoreEntry entry = new ScoreEntry { id = playerId, playername = playerName, score = score };
         string json = JsonUtility.ToJson(entry);
-        //Debug.Log("Submitting score - ID: " + playerId + ", Score: " + score + ", JSON: " + json);
+        //Debug.Log("Submitting score - ID: " + playerId + ", Name: " + playerName + ", Score: " + score + ", JSON: " + json);
 
         UnityWebRequest request = new UnityWebRequest(endpoint + "/score", "POST");
         request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(json));
@@ -96,6 +107,30 @@ public class LeaderboardManager : MonoBehaviour
         {
             //Debug.LogError("Error submitting score: " + request.error);
             //Debug.LogError("Response: " + request.downloadHandler.text);
+        }
+    }
+
+    private IEnumerator UpdatePlayerNameCoroutine(string newName)
+    {
+        // Create a simple JSON object with the new name
+        string json = "{\"playername\":\"" + newName + "\"}";
+        Debug.Log("Updating player name - ID: " + playerId + ", New Name: " + newName + ", JSON: " + json);
+
+        UnityWebRequest request = new UnityWebRequest(endpoint + "/player/" + playerId + "/name", "PUT");
+        request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(json));
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("Player name updated successfully");
+        }
+        else
+        {
+            Debug.LogError("Error updating player name: " + request.error);
+            Debug.LogError("Response: " + request.downloadHandler.text);
         }
     }
 

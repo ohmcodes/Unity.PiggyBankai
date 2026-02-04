@@ -424,6 +424,7 @@ GameObject:
   - component: {fileID: 4257971129267922683}
   - component: {fileID: 6699035831133704366}
   - component: {fileID: 1562385481757493919}
+  - component: {fileID: 8374410608929810789}
   m_Layer: 0
   m_Name: TestMap2
   m_TagString: Ground
@@ -485,6 +486,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDead: 0
+--- !u!114 &8374410608929810789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7026262530247545699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b7e614538061fd4ca494cab4faef94d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canBeSpawnedOnStart: 1
 --- !u!1 &7895216007566481303
 GameObject:
   m_ObjectHideFlags: 0
@@ -1268,6 +1282,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Coin
       objectReference: {fileID: 0}
+    - target: {fileID: 5561840916227869057, guid: 732ed55a505cbe240bd3de33a33f74f5, type: 3}
+      propertyPath: isStaticCoin
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6063625269459966393, guid: 732ed55a505cbe240bd3de33a33f74f5, type: 3}
       propertyPath: m_IsTrigger
       value: 1
@@ -1466,6 +1484,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Coin (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 5561840916227869057, guid: 732ed55a505cbe240bd3de33a33f74f5, type: 3}
+      propertyPath: isStaticCoin
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6063625269459966393, guid: 732ed55a505cbe240bd3de33a33f74f5, type: 3}
       propertyPath: m_IsTrigger
       value: 1
@@ -1535,6 +1557,10 @@ PrefabInstance:
     - target: {fileID: 5561840916227869057, guid: 732ed55a505cbe240bd3de33a33f74f5, type: 3}
       propertyPath: CoinValue
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5561840916227869057, guid: 732ed55a505cbe240bd3de33a33f74f5, type: 3}
+      propertyPath: isStaticCoin
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6063625269459966393, guid: 732ed55a505cbe240bd3de33a33f74f5, type: 3}
       propertyPath: m_IsTrigger
