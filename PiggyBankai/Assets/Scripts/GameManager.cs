@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int deathCoinReduction = 1;
     public float restartDelay = 2f;
     [SerializeField] private float currentBestDistance = 0f;
+    [SerializeField] private TMPro.TMP_Text playernameText;
 
 
     private LeaderboardManager lb;
@@ -56,6 +57,8 @@ public class GameManager : MonoBehaviour
         //StartCoroutine(LoadPersistentData());
 
         LoadCurrentBest();
+
+        playernameText.text = PlayerPrefs.GetString("PlayerName", "Guest");
     }
 
     private void LoadCurrentBest()

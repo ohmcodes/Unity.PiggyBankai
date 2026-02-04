@@ -97,13 +97,13 @@ public class MainMenu : MonoBehaviour
                 {
                     leaderboardManager.UpdatePlayerName(savedName);
                 }
-                Debug.Log("Loaded player name: " + savedName);
+                //Debug.Log("Loaded player name: " + savedName);
             }
             else
             {
                 // Generate and save new random name
                 RandomizePlayerName();
-                Debug.Log("No saved name found. Generated random name: " + txt_playername.text);
+                //Debug.Log("No saved name found. Generated random name: " + txt_playername.text);
             }
         }
     }

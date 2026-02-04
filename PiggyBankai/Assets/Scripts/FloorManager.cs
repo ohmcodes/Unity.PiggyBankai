@@ -158,7 +158,7 @@ public class FloorManager : MonoBehaviour
                     Floor floorScript = selectedPrefab.GetComponent<Floor>();
                     if (floorScript != null && floorScript.canBeSpawnedOnStart)
                     {
-                        Debug.Log("Selected floor cannot be spawned on start, selecting another.");
+                        //Debug.Log("Selected floor cannot be spawned on start, selecting another.");
                         // This floor can be spawned on start, try another one
                         continue;
                     }
